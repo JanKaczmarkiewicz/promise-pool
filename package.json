@@ -1,0 +1,25 @@
+{
+  "name": "promise-pool",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JanKaczmarkiewicz/promise-pool.git"
+  },
+  "keywords": [
+    "promise",
+    "pool",
+    "concurrency",
+    "performance"
+  ],
+  "author": "JanKaczmarkiewicz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JanKaczmarkiewicz/promise-pool/issues"
+  },
+  "homepage": "https://github.com/JanKaczmarkiewicz/promise-pool#readme"
+}
