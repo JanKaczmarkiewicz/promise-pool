@@ -5,8 +5,8 @@ const promisePool = <T>({
   promiseSeed: (() => Promise<T>)[];
   poolSize: number;
 }): Promise<T[]> =>
-  new Promise((resolve, reject) => {
-    let promises = [];
+  new Promise((resolve) => {
+    let promises: Promise<T>[] = [];
     const handlePromise = (cb: () => Promise<T>) => {
       promises.push(
         cb().then((result) => {
@@ -21,21 +21,3 @@ const promisePool = <T>({
   });
 
 export default promisePool;
-
-// function poolPromises(iterPromises, poolSize) {
-//   return new Promise((resolve, reject) => {
-//     let promises = [];
-//     function nextPromise() {
-//       let { value, done } = iterPromises.next();
-//       if (done) {
-//         resolve(Promise.all(promises));
-//       } else {
-//         promises.push(value); // value is a promise
-//         value.then(nextPromise, reject);
-//       }
-//       return !done;
-//     }
-
-//     while (promises.length < poolSize && nextPromise()) {}
-//   });
-// }
