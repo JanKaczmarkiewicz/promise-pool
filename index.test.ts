@@ -4,28 +4,36 @@ test("should result in combined promise with all promises resolved in order", as
   const wait = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
-  const promiseSeed = [
-    jest.fn(() => wait(100).then(() => 1)),
-    jest.fn(() => wait(20).then(() => 2)),
-    jest.fn(() => wait(30).then(() => 3)),
-    jest.fn(() => wait(70).then(() => 4)),
-  ];
+  const one = jest.fn(() => wait(100).then(() => 1));
+  const two = jest.fn(() => wait(20).then(() => 2));
+  const three = jest.fn(() => wait(30).then(() => 3));
+  const four = jest.fn(() => wait(70).then(() => 4));
 
-  const resultPromise = promisePool({ promiseSeed, poolSize: 2 });
+  function* promiseSource() {
+    yield one();
+    yield two();
+    yield three();
+    yield four();
+  }
 
-  expect(promiseSeed[0]).toHaveBeenCalled();
-  expect(promiseSeed[1]).toHaveBeenCalled();
-  expect(promiseSeed[2]).not.toHaveBeenCalled();
-  expect(promiseSeed[3]).not.toHaveBeenCalled();
+  const resultPromise = promisePool({
+    promiseSource: promiseSource(),
+    poolSize: 2,
+  });
+
+  expect(one).toHaveBeenCalled();
+  expect(two).toHaveBeenCalled();
+  expect(three).not.toHaveBeenCalled();
+  expect(four).not.toHaveBeenCalled();
 
   await wait(20);
 
-  expect(promiseSeed[2]).toHaveBeenCalled();
-  expect(promiseSeed[3]).not.toHaveBeenCalled();
+  expect(three).toHaveBeenCalled();
+  expect(four).not.toHaveBeenCalled();
 
   await wait(30);
 
-  expect(promiseSeed[3]).toHaveBeenCalled();
+  expect(four).toHaveBeenCalled();
 
   expect(await resultPromise).toEqual([1, 2, 3, 4]);
 });
