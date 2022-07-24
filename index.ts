@@ -1,23 +1,21 @@
 const promisePool = <T>({
-  promiseSeed,
+  promiseSource,
   poolSize,
 }: {
-  promiseSeed: (() => Promise<T>)[];
+  promiseSource: Iterator<Promise<T>, Promise<T> | void>;
   poolSize: number;
 }): Promise<T[]> =>
   new Promise((resolve) => {
-    let promises: Promise<T>[] = [];
-    const handlePromise = (cb: () => Promise<T>) => {
-      promises.push(
-        cb().then((result) => {
-          const item = promiseSeed[promises.length];
-          item ? handlePromise(item) : resolve(Promise.all(promises));
-          return result;
-        })
-      );
+    const promises: Promise<T>[] = [];
+    const handleNext = () => {
+      const iteratorResult = promiseSource.next();
+
+      iteratorResult.done
+        ? resolve(Promise.all(promises))
+        : promises.push(iteratorResult.value.finally(handleNext));
     };
 
-    promiseSeed.slice(0, poolSize).forEach(handlePromise);
+    Array(poolSize).fill(null).forEach(handleNext);
   });
 
 export default promisePool;
